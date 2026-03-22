@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Backend Test</title>
+</head>
+<body>
+
+    <h2> Backend Test UI</h2>
+
+    <!-- REGISTER -->
+    <h3>Register</h3>
+    <input type="text" id="regUsername" placeholder="Username"><br>
+    <input type="email" id="regEmail" placeholder="Email"><br>
+    <input type="password" id="regPassword" placeholder="Password"><br>
+    <button onclick="register()">Register</button>
+
+    <hr>
+
+    <!-- LOGIN -->
+    <h3>Login</h3>
+    <input type="text" id="loginUser" placeholder="Username or Email"><br>
+    <input type="password" id="loginPass" placeholder="Password"><br>
+    <button onclick="login()">Login</button>
+
+    <hr>
+
+    <!-- PROFILE -->
+    <h3>Profile (Protected)</h3>
+    <button onclick="getProfile()">Get Profile</button>
+
+    <pre id="output"></pre>
+
+<script>
+const API = "http://localhost:3000";
+let token = "";
+
+// REGISTER
+async function register() {
+    const username = document.getElementById("regUsername").value;
+    const email = document.getElementById("regEmail").value;
+    const password = document.getElementById("regPassword").value;
+
+    const res = await fetch(API + "/api/register", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ username, email, password })
+    });
+
+    const data = await res.json();
+    show(data);
+}
+
+// LOGIN
+async function login() {
+    const username = document.getElementById("loginUser").value;
+    const password = document.getElementById("loginPass").value;
+
+    const res = await fetch(API + "/api/login", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ username, password })
+    });
+
+    const data = await res.json();
+
+    if (data.token) {
+        token = data.token;
+    }
+
+    show(data);
+}
+
+// PROFILE
+async function getProfile() {
+    const res = await fetch(API + "/api/profile", {
+        headers: {
+            "Authorization": "Bearer " + token
+        }
+    });
+
+    const data = await res.json();
+    show(data);
+}
+
+// DISPLAY
+function show(data) {
+    document.getElementById("output").textContent =
+        JSON.stringify(data, null, 2);
+}
+</script>
+
+</body>
+</html>
